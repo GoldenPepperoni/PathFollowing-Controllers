@@ -149,7 +149,7 @@ def readDS4():
 roll = 0
 pitch = 0
 yaw = 0
-throttle = 0.9
+throttle = 0.6
 
 cmds = [roll, pitch, yaw, throttle]
 
@@ -185,7 +185,7 @@ C_lat = np.array([[0, 0, 0, 1],
          [0, 0, 1, 0]])
 D_lat = np.zeros((np.shape(C_lat)[0], np.shape(B_lat)[1]))
 
-p_lat = 1000
+p_lat = 2500
 Q_lat = p_lat*np.matmul(np.transpose(C_lat), C_lat)
 R_lat = np.eye(2)
 
@@ -213,7 +213,7 @@ next_obs, _ =envs.reset(aviary_options=aviary_options)
 timenow = time.time()
 imgs_array = []
 while not (terminated or truncated):
-    imgs_array.append(envs.render()[..., :3].astype(np.uint8))
+    # imgs_array.append(envs.render()[..., :3].astype(np.uint8))
 
     # Get states from last time step
     obs = next_obs['attitude']
@@ -237,8 +237,7 @@ while not (terminated or truncated):
 
     cmds = np.array([-pitch, roll, yaw, throttle])
 
-    # print(f'cmds:{cmds}, s_long:{s_long}, s_lat:{s_lat}, ang:{obs[5]}')
-
+    print([obs[7]])
     cmds = np.clip(cmds, -1, 1)
     
 

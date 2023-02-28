@@ -1,0 +1,4 @@
+git+https://github.com/GoldenPepperoni/PyFlyt.git@master#egg=PyFlyt
+git+https://github.com/AtsushiSakai/PythonRobotics.git@master#egg=PythonRobotics
+pyPS4Controller==1.2.5
+control==0.9.3.post2

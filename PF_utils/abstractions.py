@@ -53,7 +53,8 @@ def getRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
     heading_sign = np.sign(np.cross(carrot_heading_vector, UAV_heading_vector))
     heading_err = np.abs(heading_err_val) * heading_sign
 
-    flightpath_err = carrot_flightpath - UAV_theta
+    # flightpath_err = carrot_flightpath - UAV_theta
+    flightpath_err = carrot_pos[2] - UAV_pos[2]
 
     # Multiply gains
     lat_ref = Kpsi * heading_err

@@ -132,15 +132,15 @@ K_lat, _, _ = control.lqr(A_lat, B_lat, Q_lat, R_lat)
 Nbar_lat = precom(A_lat, B_lat, C_lat, K_lat)
 
 # Carrot chasing algorithm parameters
-Kpsi = 0.5
-Ktheta = 10
+Kpsi = 1
+Ktheta = 0.2
 
 
 
 
 
 
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human", angle_representation='euler')
+envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human", angle_representation='euler', flight_dome_size=200, turning_radius=40)
 
 print("Running")
 terminated = False
@@ -161,7 +161,7 @@ while not (terminated or truncated):
     s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
 
     # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta)
-    ref_lat, ref_long = getRefs(carrot_pos, obs[9:12], obs[3:6], Kpsi, Ktheta, 1.4, 1.4)
+    ref_lat, ref_long = getRefs(carrot_pos, obs[9:12], obs[3:6], Kpsi, Ktheta, 1, 1.4)
 
     ref_lat = [ref_lat, 0] # phi and r
     ref_long = [ref_long] # theta

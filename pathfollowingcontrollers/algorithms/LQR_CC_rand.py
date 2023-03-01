@@ -1,0 +1,108 @@
+import numpy as np
+import PyFlyt.gym_envs
+import gymnasium
+import control
+
+from PIL import Image
+from pathfollowingcontrollers.PF_utils.linModel import *
+from pathfollowingcontrollers.PF_utils.abstractions import *
+
+
+# r = readDS4() # For PS4 controller live inputs
+
+# Longitudinal weighting matrices
+p_long = 1000
+Q_long = p_long*np.matmul(np.transpose(C_long), C_long)
+R_long = np.eye(1)
+# Longitudinal LQR gains
+K_long, _, _ = control.lqr(A_long, B_long, Q_long, R_long)
+Nbar_long = precom(A_long, B_long, C_long, K_long)
+
+
+# Lateral weighting matrices
+p_lat = 200
+Q_lat = p_lat*np.matmul(np.transpose(C_lat), C_lat)
+R_lat = np.eye(2)
+# Lateral LQR gains
+K_lat, _, _ = control.lqr(A_lat, B_lat, Q_lat, R_lat)
+Nbar_lat = precom(A_lat, B_lat, C_lat, K_lat)
+
+# Carrot chasing algorithm parameters
+Kpsi = 1
+Ktheta = 0.2
+
+# Create and initialise dubins path env
+envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation='euler', flight_dome_size=200, turning_radius=40, num_targets=2, max_duration_seconds=100)
+next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
+terminated  = False
+truncated = False
+
+# Make gif?
+makeGif = False
+imgs_array = []
+
+# Make plots?
+makePlots = True
+ctrlTraces = []
+actualPath = [next_obs["attitude"][9:13]]
+desiredPath = infos["path"]
+tArray = []
+t = 0
+
+if __name__ == "__main__":
+    while not (terminated or truncated):
+        # Get states from last time step
+        obs = next_obs['attitude']
+        carrot_pos = next_obs['carrot_pos']
+        # Assemble state vector for longitudinal and lateral linear models
+        s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
+        s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
+
+        # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta)
+        ref_lat, ref_long = getCCRefs(carrot_pos, obs[9:12], obs[3:6], Kpsi, Ktheta, 1, 1.4)
+
+        ref_lat = [ref_lat, 0] # phi and r
+        ref_long = [ref_long] # theta
+
+        # Get control output from lqr control law
+        ctrl_lat = getCtrl(s_lat, K_lat, Nbar_lat, ref_lat)
+        ctrl_long = getCtrl(s_long, K_long, Nbar_long, ref_long)
+
+        roll = ctrl_lat[0][0]
+        yaw = ctrl_lat[1][0]
+        pitch = ctrl_long[0][0]
+        throttle = 0.6
+
+        # Assemble and saturate commands for simulation input
+        cmds = np.array([-pitch, roll, yaw, throttle])
+        cmds = np.clip(cmds, [-1, -1, -1, 0], 1)
+        
+        # Simulation step
+        next_obs, reward, terminated, truncated, infos = envs.step(cmds)
+        t += 1/30
+
+        # Collect frames if making gif
+        if makeGif:
+            imgs_array.append(envs.render()[..., :3].astype(np.uint8))
+        
+        # Collect trajectory and control traces if making plots
+        if makePlots:
+            actualPath.append(obs[9:13])
+            ctrlTraces.append(cmds)
+            tArray.append(t)
+
+    if makeGif:
+        imgs = [Image.fromarray(img) for img in imgs_array]
+        imgs[0].save("LQR_Dubins_CC.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+
+    if makePlots:
+        plotXY(desiredPath, actualPath, "Horizontal trajectory")
+        plotZ(desiredPath, actualPath, "Vertical trajectory")
+        plot3D(desiredPath, actualPath, "3D trajectory")
+
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC)")
+
+
+
+
+        

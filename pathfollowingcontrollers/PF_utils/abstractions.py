@@ -1,9 +1,153 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
+from matplotlib.ticker import FormatStrFormatter
 from pyPS4Controller.controller import Controller
 from threading import Thread, Event
 
+
 DS4cmds = [0, 0, 0, 0]
+
+def plotXY(desired, actual, title):
+    """ Create a plot showing the UAV's desired vs actual trajectory in the XY plane.
+        desired: n by 3 array, n = number of time steps
+        actual: n by 3 array, n = number of time steps
+        title: string
+    """
+
+    # Extract X and Y coordinates from path array
+    X_D = [x[0] for x in desired]
+    Y_D = [x[1] for x in desired]
+
+    # Extract X and Y coordinates from actual trajectory array
+    X_A = [x[0] for x in actual]
+    Y_A = [x[1] for x in actual]
+
+    plt.figure()
+    plt.scatter(X_D[0], Y_D[0], label="Start", c=[[0, 1, 0]])
+    plt.scatter(X_D[-1], Y_D[-1], label="End", c=[[1, 0, 0]])
+    plt.plot(X_D, Y_D, label="Desired")
+    plt.plot(X_A, Y_A, label="Actual")
+    plt.xlabel("X(m)")
+    plt.ylabel("Y(m)")
+    plt.grid(True)
+    plt.legend(loc='upper right')
+    plt.title(title)
+    plt.savefig(title)
+
+
+def plotZ(desired, actual, title):
+    """ Create a plot showing the UAV's desired vs actual trajectory in the Z axis.
+        desired: n by 3 array, n = number of time steps
+        actual: n by 3 array, n = number of time steps
+        title: string
+    """
+
+    # Extract Z and X coordinates from path array
+    X_D = [x[0] for x in desired]
+    Z_D = [x[2] for x in desired]
+
+    # Extract Z and X coordinates from actual trajectory array
+    X_A = [x[0] for x in actual]
+    Z_A = [x[2] for x in actual]
+
+    plt.figure()
+    plt.scatter(X_D[0], Z_D[0], label="Start", c=[[0, 1, 0]])
+    plt.scatter(X_D[-1], Z_D[-1], label="End", c=[[1, 0, 0]])
+    plt.plot(X_D, Z_D, label="Desired")
+    plt.plot(X_A, Z_A, label="Actual")
+    plt.ylim(min(Z_D)-5, max(Z_D)+5) # +- max and min in the Z axis, to prevent drawn out plot
+    plt.xlabel("X(m)")
+    plt.ylabel("Z(m)")
+    plt.grid(True)
+    plt.legend(loc='upper right')
+    plt.title(title)
+    plt.savefig(title)
+
+
+def plot3D(desired, actual, title):
+    """ Create a plot showing the UAV's desired vs actual trajectory in the 3-Dimensions.
+        desired: n by 3 array, n = number of time steps
+        actual: n by 3 array, n = number of time steps
+        title: string
+    """
+
+    # Extract coordinates from path array
+    X_D = [x[0] for x in desired]
+    Y_D = [x[1] for x in desired]
+    Z_D = [x[2] for x in desired]
+
+    # Extract coordinates from actual trajectory array
+    X_A = [x[0] for x in actual]
+    Y_A = [x[1] for x in actual]
+    Z_A = [x[2] for x in actual]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')    
+    ax.scatter(X_D[0], Y_D[0], Z_D[0], label="Start", c=[[0, 1, 0]])
+    ax.scatter(X_D[-1], Y_D[-1], Z_D[-1], label="End", c=[[1, 0, 0]])
+    plt.plot(X_D, Y_D, Z_D, label="Desired")
+    plt.plot(X_A, Y_A, Z_A, label="Actual")
+    ax.set_zlim3d(min(Z_D)-5, max(Z_D)+5) # +- max and min in the Z axis, to prevent drawn out plot
+    ax.set_xlabel("X(m)")
+    ax.set_ylabel("Y(m)")
+    ax.set_zlabel("Z(m)")
+    plt.grid(True)
+    plt.legend(loc='upper right')
+    plt.title(title)
+    plt.show()
+    plt.savefig(title)
+
+
+def plotCtrlTraces(ctrlArray, t, title):
+    """Create a plot containing 4 subplots for each control trace. [Pitch, Roll, Yaw, Throttle]
+        ctrlArray: n by 4 array, n = number of time steps
+        t: 1 by n array, in seconds
+        title: string
+    """
+
+    pitchCtrl = [x[0] for x in ctrlArray] 
+    rollCtrl = [x[1] for x in ctrlArray] 
+    yawCtrl = [x[2] for x in ctrlArray] 
+    throttleCtrl = [x[3] for x in ctrlArray] 
+
+    fig, axs = plt.subplots(4, 1)
+    for axis in axs:
+        axis.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+    axs[0].plot(t, pitchCtrl)
+    axs[0].set_xlim(0, t[-1])
+    axs[0].set_ylim(-1, 1)
+    axs[0].set_ylabel('Pitch')
+    axs[0].grid(True)
+
+    axs[1].plot(t, rollCtrl)
+    axs[1].set_xlim(0, t[-1])
+    axs[1].set_ylim(-1, 1)
+    axs[1].set_ylabel('Roll')
+    axs[1].grid(True)
+
+    axs[2].plot(t, yawCtrl)
+    axs[2].set_xlim(0, t[-1])
+    axs[2].set_ylim(-1, 1)
+    axs[2].set_ylabel('Yaw')
+    axs[2].grid(True)
+
+    axs[3].plot(t, throttleCtrl)
+    axs[3].set_xlim(0, t[-1])
+    axs[3].set_xlabel('Time(s)')
+    axs[3].set_ylim(0, 1)
+    axs[3].set_ylabel('Throttle')
+    axs[3].grid(True)
+
+    fig.tight_layout()
+    fig.suptitle("Control traces", fontsize="15")
+    fig.subplots_adjust(top=0.92)
+    plt.savefig(title)
+    
+
+
+
 
 def precom(A, B, C, K):
     """Implementation of precompensation block to scale reference for LQR reference tracking"""
@@ -12,7 +156,6 @@ def precom(A, B, C, K):
     mul = np.matmul(inv, B)
     denom = np.matmul(C, mul)
     Nbar = np.divide(-1, denom)
-    print(K)
 
     return Nbar 
 
@@ -26,7 +169,7 @@ def getCtrl(s, K, Nbar, ref):
 
     return ctrl
 
-def getRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
+def getCCRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
     """Calculates the controller reference based on the position of the carrot and gains
         Longitudinal reference: 
         Lateral reference: heading error to carrot
@@ -70,7 +213,9 @@ def getRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
 
 
 class MyController(Controller):
-
+    """ 
+        Gets DS4 controller inputs for manual flying
+    """
     def __init__(self, **kwargs):
         Controller.__init__(self, **kwargs)
 

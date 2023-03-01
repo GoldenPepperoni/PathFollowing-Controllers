@@ -15,7 +15,7 @@ setup(
     author_email='wongjim8@gmail.com',
     url="https://github.com/GoldenPepperoni",
     packages=find_packages(),
-    install_requires=['control', 'pyPS4Controller']
-    # 'PyFlyt@git+https://github.com/GoldenPepperoni/PyFlyt.git@master#egg=PyFlyt']
+    install_requires=['control', 'pyPS4Controller', 'matplotlib',
+    'PyFlyt@git+https://github.com/GoldenPepperoni/PyFlyt.git@master#egg=PyFlyt']
 )
 

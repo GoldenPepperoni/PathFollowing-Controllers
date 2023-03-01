@@ -1,7 +1,9 @@
 import numpy as np
 
+from pyPS4Controller.controller import Controller
+from threading import Thread, Event
 
-
+DS4cmds = [0, 0, 0, 0]
 
 def precom(A, B, C, K):
     """Implementation of precompensation block to scale reference for LQR reference tracking"""
@@ -65,3 +67,77 @@ def getRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
     long_ref = np.clip(long_ref, -longlim, longlim)
 
     return lat_ref, long_ref
+
+
+class MyController(Controller):
+
+    def __init__(self, **kwargs):
+        Controller.__init__(self, **kwargs)
+
+
+    def on_R3_down(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[0] = value
+        return value
+
+    def on_R3_up(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[0] = value
+        return value
+
+    def on_R3_left(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[1] = value
+        return value
+
+    def on_R3_right(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[1] = value
+        return value
+
+    def on_L3_left(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[2] = value
+        return value
+
+    def on_L3_right(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[2] = value
+        return value
+
+    def on_R2_press(self, value):
+        global DS4cmds
+
+        value = value / 32767
+
+        DS4cmds[3] = value
+        return value
+
+
+def DS4Targ():
+    controller = MyController(interface="/dev/input/js0", connecting_using_ds4drv=False)
+    controller.listen()
+
+def readDS4():
+    global DS4cmds
+    t = Thread(target=DS4Targ, args=())
+    t.start()
+    return DS4cmds

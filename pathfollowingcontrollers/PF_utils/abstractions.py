@@ -1,12 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
+from os import path
 from matplotlib.ticker import FormatStrFormatter
 from pyPS4Controller.controller import Controller
 from threading import Thread, Event
 
+# Create directory for plots if dont already exist
+if not os.path.exists('plots'):
+    os.mkdir('plots')
 
 DS4cmds = [0, 0, 0, 0]
+
 
 def plotXY(desired, actual, title):
     """ Create a plot showing the UAV's desired vs actual trajectory in the XY plane.
@@ -33,7 +39,7 @@ def plotXY(desired, actual, title):
     plt.grid(True)
     plt.legend(loc='upper right')
     plt.title(title)
-    plt.savefig(title)
+    plt.savefig("plots/"+title)
 
 
 def plotZ(desired, actual, title):
@@ -62,7 +68,8 @@ def plotZ(desired, actual, title):
     plt.grid(True)
     plt.legend(loc='upper right')
     plt.title(title)
-    plt.savefig(title)
+    plt.savefig("plots/"+title)
+    
 
 
 def plot3D(desired, actual, title):
@@ -95,8 +102,9 @@ def plot3D(desired, actual, title):
     plt.grid(True)
     plt.legend(loc='upper right')
     plt.title(title)
-    plt.show()
-    plt.savefig(title)
+    plt.savefig("plots/"+title)
+
+
 
 
 def plotCtrlTraces(ctrlArray, t, title):
@@ -143,7 +151,7 @@ def plotCtrlTraces(ctrlArray, t, title):
     fig.tight_layout()
     fig.suptitle("Control traces", fontsize="15")
     fig.subplots_adjust(top=0.92)
-    plt.savefig(title)
+    plt.savefig("plots/"+title)
     
 
 

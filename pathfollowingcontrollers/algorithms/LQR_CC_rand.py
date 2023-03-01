@@ -3,6 +3,7 @@ import PyFlyt.gym_envs
 import gymnasium
 import control
 
+
 from PIL import Image
 from pathfollowingcontrollers.PF_utils.linModel import *
 from pathfollowingcontrollers.PF_utils.abstractions import *
@@ -32,7 +33,7 @@ Kpsi = 1
 Ktheta = 0.2
 
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation='euler', flight_dome_size=200, turning_radius=40, num_targets=2, max_duration_seconds=100)
+envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation='euler', flight_dome_size=200, turning_radius=40, num_targets=5, max_duration_seconds=100)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
@@ -96,11 +97,11 @@ if __name__ == "__main__":
         imgs[0].save("LQR_Dubins_CC.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
     if makePlots:
-        plotXY(desiredPath, actualPath, "Horizontal trajectory")
-        plotZ(desiredPath, actualPath, "Vertical trajectory")
-        plot3D(desiredPath, actualPath, "3D trajectory")
-
-        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC)")
+        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_rand)")
+        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_rand)")
+        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_rand)")
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_rand)")
+        plt.show()
 
 
 

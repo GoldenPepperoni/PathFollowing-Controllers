@@ -3,8 +3,8 @@ import gymnasium
 import control
 
 from PIL import Image
-from PF_utils.linModel import *
-from PF_utils.abstractions import precom, getCtrl, getRefs, readDS4
+from pathfollowingcontrollers.PF_utils.linModel import *
+from pathfollowingcontrollers.PF_utils.abstractions import precom, getCtrl, getRefs, readDS4
 
 
 # r = readDS4() # For PS4 controller live inputs

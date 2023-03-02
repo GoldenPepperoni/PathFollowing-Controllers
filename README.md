@@ -13,20 +13,27 @@ Key features:
 ## Installation
 
 1. Git clone this repository to a directory of your choice. (Creates a folder named `/PathFollowing-Controllers/`)
+
 ```sh
 git clone https://github.com/GoldenPepperoni/PathFollowing-Controllers.git
 ```
+
 2. Go to repository folder
+
 ```sh
 cd ./PathFollowing-Controllers/
 ```
+
 3. Install packages, and any other dependencies (such as PyFlyt)
+
 ```sh
 pip3 install -e ./
 ```
 
 ## Usage
+
 ### Quickstart
+
 Each script in `/PathFollowing-Controllers/pathfollowingcontrollers/algorithms/` can be run individually
 
 ```sh
@@ -35,8 +42,11 @@ python3 LQR_CC_8.py
 ```
 
 ### Watch simulation in (almost) real time 
+
 By default, rendering is disabled, which allows the simulation to run as fast as possible.
+
 To enable rendering, change `render_mode=None` to `render_mode="human"` in the script:
+
 ```py
 # Create and initialise dubins path env
 envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
@@ -44,11 +54,14 @@ envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
 
 ### Plotting 
 By default, plots will be generated when the scripts were ran. Plots are saved to `/PathFollowing-Controllers/plots/` folder
+
 To disable plots, edit the following in the script:
+
 ```py
 # Make plots?
 makePlots = False
 ```
+
 A total of 6 plots will be generated:
 1. Poles and Zeros plot for the Longitudinal State Matrix
 2. Poles and Zeros plot for the Lateral State Matrix
@@ -59,16 +72,20 @@ A total of 6 plots will be generated:
 
 ### Gif maker
 ***Please note that enabling gif making will slow down the simulation due to image capture in every frame (Does not affect physics simulation)***
+
 By default, gif making is disabled. To enable, edit the following in the script:
 ```py
 # Make gif?
 makePlots = True
 ```
+
 and enable rendering:
+
 ```py
 # Create and initialise dubins path env
 envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
 ```
+
 A GUI will appear that shows the UAV performing in (almost) real time. 
 
 Red sphere represents the Virtual Target Point/Carrot, and green spheres are waypoints.

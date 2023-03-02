@@ -14,8 +14,12 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 Kpsi = 2.5
 Ktheta = 0.5
 
+# Create custom figure 8 path
+custom_targets = [[0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [0, 50, 10]]
+custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2,] # (-pi to pi)
+
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation='euler', flight_dome_size=200, turning_radius=50, num_targets=2)
+envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
@@ -76,13 +80,13 @@ if __name__ == "__main__":
 
     if makeGif:
         imgs = [Image.fromarray(img) for img in imgs_array]
-        imgs[0].save("LQR_CC_rand.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+        imgs[0].save("LQR_CC_spiral.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
     if makePlots:
-        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_rand)")
-        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_rand)")
-        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_rand)")
-        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_rand)")
+        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_spiral)")
+        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_spiral)")
+        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_spiral)")
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_spiral)")
         plt.show()
 
 

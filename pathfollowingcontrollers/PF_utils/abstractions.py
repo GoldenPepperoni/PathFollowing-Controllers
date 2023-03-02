@@ -13,6 +13,26 @@ if not os.path.exists('plots'):
 
 DS4cmds = [0, 0, 0, 0]
 
+def plotZP(poles, zeros, title):
+
+    fig = plt.figure()
+    ax = fig.add_subplot()  
+
+    ax.set_xlabel('Real')
+    ax.set_ylabel('Imaginary')
+    ax.axhline(y=0, color='black', lw=1)
+    ax.axvline(x=0, color='black', lw=1)
+
+    if len(poles) > 0:
+        ax.scatter(poles.real, poles.imag, s=50, marker='x',
+                    facecolors='k', label='Poles')
+    if len(zeros) > 0:
+        ax.scatter(zeros.real, zeros.imag, s=50, marker='o',
+                    facecolors='none', edgecolors='k', label='Zeros')
+    
+    plt.legend(loc='upper center')
+    plt.title(title)
+    plt.savefig("plots/"+title)
 
 def plotXY(desired, actual, title):
     """ Create a plot showing the UAV's desired vs actual trajectory in the XY plane.
@@ -152,9 +172,6 @@ def plotCtrlTraces(ctrlArray, t, title):
     fig.suptitle("Control traces", fontsize="15")
     fig.subplots_adjust(top=0.92)
     plt.savefig("plots/"+title)
-    
-
-
 
 
 def precom(A, B, C, K):

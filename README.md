@@ -12,7 +12,7 @@ Key features:
 
 ## Installation
 
-1. Git clone this repository to a directory of your choice. (Creates a folder named /PathFollowing-Controllers/)
+1. Git clone this repository to a directory of your choice. (Creates a folder named `/PathFollowing-Controllers/`)
 ```sh
 git clone https://github.com/GoldenPepperoni/PathFollowing-Controllers.git
 ```

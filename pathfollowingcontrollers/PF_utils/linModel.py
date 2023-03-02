@@ -74,7 +74,7 @@ plotZP(poles_lat, zeros_lat, "Lateral Poles and Zeros")
 # Longitudinal weighting matrices
 p_long = 100
 Q_long = p_long*np.matmul(np.transpose(C_long), C_long)
-R_long = np.eye(1)
+R_long = np.eye(np.shape(C_long)[0])
 # Longitudinal LQR gains
 K_long, _, _ = control.lqr(A_long, B_long, Q_long, R_long)
 Nbar_long = precom(A_long, B_long, C_long, K_long)
@@ -83,7 +83,7 @@ Nbar_long = precom(A_long, B_long, C_long, K_long)
 # Lateral weighting matrices
 p_lat = 30
 Q_lat = p_lat*np.matmul(np.transpose(C_lat), C_lat)
-R_lat = np.eye(2)
+R_lat = np.eye(np.shape(C_lat)[0])
 # Lateral LQR gains
 K_lat, _, _ = control.lqr(A_lat, B_lat, Q_lat, R_lat)
 Nbar_lat = precom(A_lat, B_lat, C_lat, K_lat)

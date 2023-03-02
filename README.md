@@ -70,6 +70,7 @@ and enable rendering:
 envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
 ```
 A GUI will appear that shows the UAV performing in (almost) real time. 
+Red sphere represents the Virtual Target Point/Carrot, and green spheres are waypoints.
 Example gif:
 <p align="center">
     <img src="/readme_assets/LQR_CC_rand.gif" width="500px"/>

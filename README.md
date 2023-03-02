@@ -42,6 +42,22 @@ To enable rendering, change `render_mode=None` to `render_mode="human"` in the s
 envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
 ```
 
+### Custom waypoints
+
+To let the UAV follow a custom waypoint, simply edit the `custom_targets` and `custom_yaw_targets` variables in the script.
+
+```py
+# Create a custom "S" path
+custom_targets = [[50, 100, 10], [50, 200, 10], [50, 300, 10], [50, 400, 10], [50, 500, 10]] # Coordinates of the waypoints
+custom_yaw_targets = [0, np.pi, 0, np.pi, 0] # Orientation of the UAV at the waypoints in the XY plane (-pi to pi)
+
+```
+3D plot:
+<p align="center">
+    <img src="/readme_assets/CustomS.png" width="500px"/>
+</p>
+
+
 ### Plotting 
 By default, plots will be generated when the scripts were ran. Plots are saved to `/PathFollowing-Controllers/plots/` folder
 To disable plots, edit the following in the script:
@@ -74,8 +90,6 @@ Example gif:
 <p align="center">
     <img src="/readme_assets/LQR_CC_rand.gif" width="500px"/>
 </p>
-
-
 
 
 

@@ -14,7 +14,7 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 Kpsi = 2.5
 Ktheta = 0.5
 
-# Create custom circle path
+# Create custom straight path
 custom_targets = [[0, 200, 10]]
 custom_yaw_targets = [np.pi/2] # (-pi to pi)
 

@@ -20,7 +20,7 @@ git clone https://github.com/GoldenPepperoni/PathFollowing-Controllers.git
 ```sh
 cd ./PathFollowing-Controllers/
 ```
-3. Install packages, and any other dependencies (PyFlyt)
+3. Install packages, and any other dependencies (such as PyFlyt)
 ```sh
 pip3 install -e ./
 ```

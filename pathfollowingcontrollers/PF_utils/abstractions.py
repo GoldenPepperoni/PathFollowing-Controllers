@@ -146,19 +146,19 @@ def plotCtrlTraces(ctrlArray, t, title):
     axs[0].plot(t, pitchCtrl)
     axs[0].set_xlim(0, t[-1])
     axs[0].set_ylim(-1, 1)
-    axs[0].set_ylabel('Pitch')
+    axs[0].set_ylabel('Elevator')
     axs[0].grid(True)
 
     axs[1].plot(t, rollCtrl)
     axs[1].set_xlim(0, t[-1])
     axs[1].set_ylim(-1, 1)
-    axs[1].set_ylabel('Roll')
+    axs[1].set_ylabel('Aileron')
     axs[1].grid(True)
 
     axs[2].plot(t, yawCtrl)
     axs[2].set_xlim(0, t[-1])
     axs[2].set_ylim(-1, 1)
-    axs[2].set_ylabel('Yaw')
+    axs[2].set_ylabel('Rudder')
     axs[2].grid(True)
 
     axs[3].plot(t, throttleCtrl)

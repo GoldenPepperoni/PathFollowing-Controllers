@@ -51,13 +51,13 @@ if __name__ == "__main__":
         ctrl_lat = getCtrl(s_lat, K_lat, Nbar_lat, ref_lat)
         ctrl_long = getCtrl(s_long, K_long, Nbar_long, ref_long)
 
-        roll = ctrl_lat[0][0]
-        yaw = ctrl_lat[1][0]
-        pitch = ctrl_long[0][0]
+        ail = ctrl_lat[0][0]
+        rud = ctrl_lat[1][0]
+        elev = ctrl_long[0][0]
         throttle = 0.5
 
         # Assemble and saturate commands for simulation input
-        cmds = np.array([-pitch, roll, yaw, throttle])
+        cmds = np.array([-elev, ail, rud, throttle])
         cmds = np.clip(cmds, [-1, -1, -1, 0], 1)
         
         # Simulation step

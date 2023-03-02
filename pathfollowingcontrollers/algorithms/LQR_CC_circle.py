@@ -55,13 +55,13 @@ if __name__ == "__main__":
         ctrl_lat = getCtrl(s_lat, K_lat, Nbar_lat, ref_lat)
         ctrl_long = getCtrl(s_long, K_long, Nbar_long, ref_long)
 
-        roll = ctrl_lat[0][0]
-        yaw = ctrl_lat[1][0]
-        pitch = ctrl_long[0][0]
+        ail = ctrl_lat[0][0]
+        rud = ctrl_lat[1][0]
+        elev = ctrl_long[0][0]
         throttle = 0.5
 
         # Assemble and saturate commands for simulation input
-        cmds = np.array([-pitch, roll, yaw, throttle])
+        cmds = np.array([-elev, ail, rud, throttle])
         cmds = np.clip(cmds, [-1, -1, -1, 0], 1)
         
         # Simulation step
@@ -83,10 +83,10 @@ if __name__ == "__main__":
         imgs[0].save("LQR_CC_circle.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
     if makePlots:
-        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_spiral)")
-        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_spiral)")
-        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_spiral)")
-        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_spiral)")
+        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_circle)")
+        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_circle)")
+        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_circle)")
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_circle)")
         plt.show()
 
 

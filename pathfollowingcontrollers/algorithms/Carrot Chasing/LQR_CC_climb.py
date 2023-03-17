@@ -10,17 +10,16 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 
 # r = readDS4() # For PS4 controller live inputs
 
-# NLGL algorithm parameters
-Kphi = 1
+# Carrot chasing algorithm parameters
+Kpsi = 2.5
 Ktheta = 0.5
-L1 = 15
 
-# Create custom spiral path
-custom_targets = [[0, 50, 10], [-100, 50, 15], [0, 50, 20], [-100, 50, 25], [0, 50, 30], [-100, 50, 35], [0, 50, 40], [-100, 50, 45]]
-custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2] # (-pi to pi)
+# Create custom straight path
+custom_targets = [[100, -100, 30]]
+custom_yaw_targets = [np.pi/2] # (-pi to pi)
 
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
+envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
@@ -46,8 +45,8 @@ if __name__ == "__main__":
         s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
         s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
 
-        # Get references from NLGL algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1)
-        ref_lat, ref_long = getNLGLRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kphi, Ktheta, L1, 1, 1.4)
+        # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta)
+        ref_lat, ref_long = getCCRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kpsi, Ktheta, 1, 1.4)
 
         ref_lat = [ref_lat, 0] # phi and r
         ref_long = [ref_long] # theta
@@ -81,13 +80,13 @@ if __name__ == "__main__":
 
     if makeGif:
         imgs = [Image.fromarray(img) for img in imgs_array]
-        imgs[0].save("LQR_CC_spiral.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+        imgs[0].save("LQR_CC_straight.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
     if makePlots:
-        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_spiral)")
-        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_spiral)")
-        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_spiral)")
-        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_spiral)")
+        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_straight)")
+        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_straight)")
+        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_straight)")
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_straight)")
         plt.show()
 
 

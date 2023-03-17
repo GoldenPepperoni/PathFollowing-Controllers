@@ -238,7 +238,7 @@ def getCCRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, latlim, longl
     return lat_ref, long_ref
 
 
-def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, L1, latlim, longlim):
+def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1, latlim, longlim):
     """Calculates the controller reference based on NLGL
         Longitudinal reference: 
         Lateral reference: heading error to carrot
@@ -274,7 +274,7 @@ def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, L1, latlim,
     # Apply coordinated turn kinematics to get phi
     phi = np.arctan((np.sqrt(acc_cmd * R) * eta) / 9.81)
 
-    lat_ref = Kpsi * phi
+    lat_ref = Kphi * phi
 
     # Get altitude error
     altitude_err = carrot_pos[2] - UAV_pos[2]   
@@ -285,6 +285,46 @@ def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, L1, latlim,
     long_ref = np.clip(long_ref, -longlim, longlim)
 
     return lat_ref, long_ref
+
+
+class PID:
+    def __init__(
+        self,
+        Kp: np.ndarray,
+        Ki: np.ndarray,
+        Kd: np.ndarray,
+        limits: np.ndarray,
+        period: float,
+    ):
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
+        self.limits = limits
+        self.period = period
+
+        # runtime variables
+        self._integral = np.zeros_like(self.Kp)
+        self._prev_error = np.zeros_like(self.Kp)
+
+    def reset(self):
+        self._integral *= 0.0
+        self._prev_error *= 0.0
+
+    def step(self, state: np.ndarray, setpoint: np.ndarray) -> np.ndarray:
+        error = setpoint - state
+
+        self._integral = np.clip(
+            self._integral + self.Ki * error * self.period, -self.limits, self.limits
+        )
+
+        derivative = self.Kd * (error - self._prev_error) / self.period
+        self._prev_error = error
+
+        proportional = self.Kp * error
+
+        return np.clip(
+            proportional + self._integral + derivative, -self.limits, self.limits
+        )
 
 
 class GameController(Controller):

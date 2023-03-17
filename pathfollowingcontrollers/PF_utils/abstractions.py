@@ -34,6 +34,7 @@ def plotZP(poles, zeros, title):
     plt.title(title)
     plt.savefig("plots/"+title)
 
+
 def plotXY(desired, actual, title):
     """ Create a plot showing the UAV's desired vs actual trajectory in the XY plane.
         desired: n by 3 array, n = number of time steps
@@ -89,7 +90,6 @@ def plotZ(desired, actual, title):
     plt.legend(loc='upper right')
     plt.title(title)
     plt.savefig("plots/"+title)
-    
 
 
 def plot3D(desired, actual, title):
@@ -123,8 +123,6 @@ def plot3D(desired, actual, title):
     plt.legend(loc='upper right')
     plt.title(title)
     plt.savefig("plots/"+title)
-
-
 
 
 def plotCtrlTraces(ctrlArray, t, title):
@@ -184,6 +182,7 @@ def precom(A, B, C, K):
 
     return Nbar 
 
+
 def getCtrl(s, K, Nbar, ref):
     """Calculates control effort given a reference and state vector"""
     s_gained = np.matmul(K, s) # Kx
@@ -194,25 +193,25 @@ def getCtrl(s, K, Nbar, ref):
 
     return ctrl
 
-def getCCRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
+
+def getCCRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, latlim, longlim):
     """Calculates the controller reference based on the position of the carrot and gains
         Longitudinal reference: 
         Lateral reference: heading error to carrot
     """
+
+    # Get UAV speed 
+    UAV_speed = np.linalg.norm(UAV_vel)
+
     # Get vector from UAV to carrot
     vector2carrot = carrot_pos - UAV_pos
 
     # UAV euler angles
     UAV_psi = UAV_ang[2]
-    UAV_theta = UAV_ang[0]
 
     # Calculate carrot heading vector and UAV heading vector in world frame
     carrot_heading_vector = [vector2carrot[1], -vector2carrot[0]]
     UAV_heading_vector = [np.cos(UAV_psi), np.sin(UAV_psi)]
-
-    # Calculate flight path angle from UAV to carrot
-    XY_vect = np.linalg.norm([vector2carrot[0], vector2carrot[1]])
-    carrot_flightpath = np.arctan(vector2carrot[2]/XY_vect)
 
     # Calculate errors
     # Handle +pi/-pi problem
@@ -222,13 +221,15 @@ def getCCRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
     heading_err_val = np.arccos(np.clip(dot/norm, -1, 1))
     heading_sign = np.sign(np.cross(carrot_heading_vector, UAV_heading_vector))
     heading_err = np.abs(heading_err_val) * heading_sign
+    heading_err =  heading_err * Kpsi # Apply gain
 
-    # flightpath_err = carrot_flightpath - UAV_theta
-    flightpath_err = carrot_pos[2] - UAV_pos[2]
+    # Apply coordinated turn kinematic model to convert heading error (psi_dot) to phi
+    phi = np.arctan(heading_err * UAV_speed / 9.81)
+    lat_ref = phi
 
-    # Multiply gains
-    lat_ref = Kpsi * heading_err
-    long_ref = Ktheta * flightpath_err
+    # Get altitude error
+    altitude_err = carrot_pos[2] - UAV_pos[2]
+    long_ref = Ktheta * altitude_err
 
     # Saturate limits
     lat_ref = np.clip(lat_ref, -latlim, latlim)
@@ -237,7 +238,56 @@ def getCCRefs(carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta, latlim, longlim):
     return lat_ref, long_ref
 
 
-class MyController(Controller):
+def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, L1, latlim, longlim):
+    """Calculates the controller reference based on NLGL
+        Longitudinal reference: 
+        Lateral reference: heading error to carrot
+    """
+    # Get UAV speed 
+    UAV_speed = np.linalg.norm(UAV_vel)
+
+    # Get vector from UAV to carrot
+    vector2carrot = carrot_pos - UAV_pos
+
+    # UAV euler angles
+    UAV_psi = UAV_ang[2]
+
+    # Calculate carrot heading vector and UAV heading vector in world frame
+    carrot_heading_vector = [vector2carrot[1], -vector2carrot[0]]
+    UAV_heading_vector = [np.cos(UAV_psi), np.sin(UAV_psi)]
+
+    # Calculate errors
+    # Handle +pi/-pi problem
+    dot = np.dot(carrot_heading_vector, UAV_heading_vector)
+    norm = np.linalg.norm(carrot_heading_vector) * np.linalg.norm(UAV_heading_vector)
+
+    heading_err_val = np.arccos(np.clip(dot/norm, -1, 1))
+    heading_sign = np.sign(np.cross(carrot_heading_vector, UAV_heading_vector))
+    eta = np.abs(heading_err_val) * heading_sign # heading error
+
+    # Get turn radius from NLGL
+    R = 0 if eta == 0 else (L1 / (2 * np.sin(eta))) # Handle division by zero
+
+    # Get NLGL lateral acceleration command 
+    acc_cmd = 2 * np.square(UAV_speed) / L1 * np.sin(eta)
+
+    # Apply coordinated turn kinematics to get phi
+    phi = np.arctan((np.sqrt(acc_cmd * R) * eta) / 9.81)
+
+    lat_ref = Kpsi * phi
+
+    # Get altitude error
+    altitude_err = carrot_pos[2] - UAV_pos[2]   
+    long_ref = Ktheta * altitude_err
+
+    # Saturate limits
+    lat_ref = np.clip(lat_ref, -latlim, latlim)
+    long_ref = np.clip(long_ref, -longlim, longlim)
+
+    return lat_ref, long_ref
+
+
+class GameController(Controller):
     """ 
         Gets DS4 controller inputs for manual flying
     """
@@ -303,8 +353,9 @@ class MyController(Controller):
 
 
 def DS4Targ():
-    controller = MyController(interface="/dev/input/js0", connecting_using_ds4drv=False)
+    controller = GameController(interface="/dev/input/js0", connecting_using_ds4drv=False)
     controller.listen()
+
 
 def readDS4():
     global DS4cmds

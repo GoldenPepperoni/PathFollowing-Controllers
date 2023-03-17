@@ -10,16 +10,17 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 
 # r = readDS4() # For PS4 controller live inputs
 
-# Carrot chasing algorithm parameters
-Kpsi = 2.5
+# NLGL algorithm parameters
+Kpsi = 1
 Ktheta = 0.5
+L1 = 13
 
 # Create custom circle path
 custom_targets = [[0, 50, 10], [-100, 50, 10], [0, 50, 10], [-100, 50, 10], [0, 50, 10]]
 custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2] # (-pi to pi)
 
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets)
+envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
@@ -45,8 +46,8 @@ if __name__ == "__main__":
         s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
         s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
 
-        # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta)
-        ref_lat, ref_long = getCCRefs(carrot_pos, obs[9:12], obs[3:6], Kpsi, Ktheta, 1, 1.4)
+        # Get references from NLGL algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta, L1)
+        ref_lat, ref_long = getNLGLRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kpsi, Ktheta, L1, 1, 1.4)
 
         ref_lat = [ref_lat, 0] # phi and r
         ref_long = [ref_long] # theta

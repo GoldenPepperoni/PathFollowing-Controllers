@@ -11,7 +11,7 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 # r = readDS4() # For PS4 controller live inputs
 
 # Carrot chasing algorithm parameters
-Kpsi = 2.5
+Kpsi = 1
 Ktheta = 0.5
 
 # Create and initialise dubins path env
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
         s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
 
-        # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, Kpsi, Ktheta)
-        ref_lat, ref_long = getCCRefs(carrot_pos, obs[9:12], obs[3:6], Kpsi, Ktheta, 1, 1.4)
+        # Get references from carrot chasing algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kpsi, Ktheta)
+        ref_lat, ref_long = getCCRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kpsi, Ktheta, 1, 1.4)
 
         ref_lat = [ref_lat, 0] # phi and r
         ref_long = [ref_long] # theta

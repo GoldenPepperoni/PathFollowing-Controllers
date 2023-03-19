@@ -81,13 +81,13 @@ if __name__ == "__main__":
 
     if makeGif:
         imgs = [Image.fromarray(img) for img in imgs_array]
-        imgs[0].save("LQR_CC_8.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+        imgs[0].save("LQR_NLGL_8.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
     if makePlots:
-        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_CC_8)")
-        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_CC_8)")
-        plot3D(desiredPath, actualPath, "3D trajectory (LQR_CC_8)")
-        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_CC_8)")
+        plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_NLGL_8)")
+        plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_NLGL_8)")
+        plot3D(desiredPath, actualPath, "3D trajectory (LQR_NLGL_8)")
+        plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_NLGL_8)")
         plt.show()
 
 

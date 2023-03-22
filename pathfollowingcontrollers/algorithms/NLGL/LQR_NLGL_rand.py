@@ -69,11 +69,10 @@ if __name__ == "__main__":
         if makeGif:
             imgs_array.append(envs.render()[..., :3].astype(np.uint8))
         
-        # Collect trajectory and control traces if making plots
-        if makePlots:
-            actualPath.append(obs[9:13])
-            ctrlTraces.append(cmds)
-            tArray.append(t)
+        # Collect trajectory and control traces
+        actualPath.append(obs[9:13])
+        ctrlTraces.append(cmds)
+        tArray.append(t)
 
     if makeGif:
         imgs = [Image.fromarray(img) for img in imgs_array]

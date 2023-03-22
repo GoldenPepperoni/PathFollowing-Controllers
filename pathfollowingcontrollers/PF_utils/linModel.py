@@ -83,7 +83,7 @@ Nbar_long = precom(A_long, B_long, C_long, K_long)
 # Lateral weighting matrices
 p_lat = 30
 Q_lat = p_lat*np.matmul(np.transpose(C_lat), C_lat)
-R_lat = np.eye(np.shape(C_lat)[0])
+R_lat = 10 * np.eye(np.shape(C_lat)[0])
 # Lateral LQR gains
 K_lat, _, _ = control.lqr(A_lat, B_lat, Q_lat, R_lat)
 Nbar_lat = precom(A_lat, B_lat, C_lat, K_lat)

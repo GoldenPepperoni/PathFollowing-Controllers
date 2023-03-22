@@ -20,7 +20,7 @@ custom_targets = [[0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [
 custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2,] # (-pi to pi)
 
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
+envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", spawn_pos=np.array([[10.0, 10.0, 10.0]]), flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
@@ -73,11 +73,10 @@ if __name__ == "__main__":
         if makeGif:
             imgs_array.append(envs.render()[..., :3].astype(np.uint8))
         
-        # Collect trajectory and control traces if making plots
-        if makePlots:
-            actualPath.append(obs[9:13])
-            ctrlTraces.append(cmds)
-            tArray.append(t)
+        # Collect trajectory and control traces
+        actualPath.append(obs[9:13])
+        ctrlTraces.append(cmds)
+        tArray.append(t)
 
     if makeGif:
         imgs = [Image.fromarray(img) for img in imgs_array]

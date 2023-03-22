@@ -25,7 +25,7 @@ makeGif = False
 imgs_array = []
 
 # Make plots?
-makePlots = True
+makePlots = False
 ctrlTraces = []
 actualPath = [next_obs["attitude"][9:13]]
 desiredPath = infos["path"]

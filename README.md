@@ -7,7 +7,7 @@ Key features:
 - The fixed wing UAV was modelled and simulated as part of [PyFlyt](https://github.com/jjshoots/PyFlyt), more information on the physics and flight model can be found there.
 - Path planning was done by generating a Dubin's path for a set of waypoints.
 - Carrot chasing and [Non-linear Guidance Law](http://acl.mit.edu/papers/gnc_park_deyst_how.pdf) path following algorithm was implemented to follow the generated path.
-- Lower level controls (Elev, Ail, Rud, Thr) were performed by a LQR controller with references from the path following algorithms.
+- Lower level controls (Elev, Ail, Rud, Thr) were performed by a LQR controller with control references from the path following algorithms.
 - Linearised state space matrices of the longitudinal and lateral dynamics used for the LQR controller were obatained from XFLR5 stability analysis.
 - Gif generator to visualise simulation in real time
 - Plot generator to provide illustration of trajectory, control traces and zero-pole plots.
@@ -39,9 +39,10 @@ pip3 install -e ./
 
 Each script in `/PathFollowing-Controllers/pathfollowingcontrollers/algorithms/` can be run individually
 
+An example to simulate a Figure 8 flight path guided by the Carrot Chasing algorithm:
 ```sh
-cd ./pathfollowingcontrollers/algorithms/
-python3 LQR_CC_8.py
+cd ./pathfollowingcontrollers/algorithms/CarrotChasing/
+python3 8.py
 ```
 
 
@@ -57,7 +58,7 @@ By default, the UAV is spawned at [0.0, 0.0, 10.0] for [X, Y, Z] coordinates res
 envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", spawn_pos=np.array([[10.0, 10.0, 10.0]]),...
 ```
 
-By default, the UAV is spawned at [0.0, 0.0, 0.0] for rotations around [X, Y, Z] coordinates respectively. To change the spawn orientation, add a `spawn_orn` keyword argument to the environment creation:
+By default, the UAV is spawned at [0.0, 0.0, 0.0] for rotations around [X, Y, Z] axes respectively. To change the spawn orientation, add a `spawn_orn` keyword argument to the environment creation:
 
 ```py
 # Create and initialise dubins path env
@@ -97,13 +98,13 @@ custom_yaw_targets = [0, np.pi, 0, np.pi, 0] # Orientation of the UAV at the way
 
 
 ### Plotting 
-By default, plots will be generated when the scripts were ran. Plots are saved to `/PathFollowing-Controllers/plots/` folder
+By default, plots will not be generated when the scripts were ran. Plots are saved to `/PathFollowing-Controllers/plots/` folder
 
-To disable plots, edit the following in the script:
+To enable plots, edit the following in the script:
 
 ```py
 # Make plots?
-makePlots = False
+makePlots = True
 ```
 
 A total of 6 plots will be generated:
@@ -143,7 +144,7 @@ Example gif of a Figure 8 path guided by the Carrot Chasing algorithm:
 
 ### Comparison Tool
 
-The comparison tool takes in individual `/PathFollowing-Controllers/pathfollowingcontrollers/algorithms/` scripts as command line arguments. There are no limit on the number of algorithms to be compared at a time, designed to be scalable for furture algorithms. 
+The comparison tool takes in individual `/PathFollowing-Controllers/pathfollowingcontrollers/algorithms/` scripts as command line arguments. There are no limit on the number of algorithms to be compared at a time, designed to be scalable for future algorithm implementations. 
 
 Here is an example on how to use this tool to compare between 2 algorithms, `NLGL/8.py` and `CarrotChasing/8.py`:
 

@@ -20,13 +20,13 @@ custom_targets = [[0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [
 custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2,] # (-pi to pi)
 
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode="human", angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
+envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
 terminated  = False
 truncated = False
 
 # Make gif?
-makeGif = True
+makeGif = False
 imgs_array = []
 
 # Make plots?

@@ -6,9 +6,12 @@ This repository is the culmination of path following algorithms for a fixed-wing
 Key features:
 - The fixed wing UAV was modelled and simulated as part of [PyFlyt](https://github.com/jjshoots/PyFlyt), more information on the physics and flight model can be found there.
 - Path planning was done by generating a Dubin's path for a set of waypoints.
-- Carrot chasing path following algorithm was implemented to follow the generated path. (NLGL coming soon!)
+- Carrot chasing and [Non-linear Guidance Law](http://acl.mit.edu/papers/gnc_park_deyst_how.pdf) path following algorithm was implemented to follow the generated path.
 - Lower level controls (Elev, Ail, Rud, Thr) were performed by a LQR controller with references from the path following algorithms.
 - Linearised state space matrices of the longitudinal and lateral dynamics used for the LQR controller were obatained from XFLR5 stability analysis.
+- Gif generator to visualise simulation in real time
+- Plot generator to provide illustration of trajectory, control traces and zero-pole plots.
+- Comparison tool for obtaining performance statistics between algorithms, such as tracking error (IAE, ISE and ITSE) and 3D spatial trajectory comparison
 
 ## Installation
 
@@ -41,6 +44,28 @@ cd ./pathfollowingcontrollers/algorithms/
 python3 LQR_CC_8.py
 ```
 
+
+
+### Spawn the UAV away from the origin (With a different orientation)
+
+This functionality provides the user an option to spawn the UAV away from the origin. This is useful to study how the UAV converges onto the path. Especially useful for comparisons.
+
+By default, the UAV is spawned at [0.0, 0.0, 10.0] for [X, Y, Z] coordinates respectively. To change the spawn location, add a `spawn_pos` keyword argument to the environment creation:
+
+```py
+# Create and initialise dubins path env
+envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", spawn_pos=np.array([[10.0, 10.0, 10.0]]),...
+```
+
+By default, the UAV is spawned at [0.0, 0.0, 0.0] for rotations around [X, Y, Z] coordinates respectively. To change the spawn orientation, add a `spawn_orn` keyword argument to the environment creation:
+
+```py
+# Create and initialise dubins path env
+envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", spawn_orn=np.array([[0.0, 0.0, 1.0]]),...
+```
+
+
+
 ### Watch simulation in (almost) real time 
 
 By default, rendering is disabled, which allows the simulation to run as fast as possible.
@@ -49,8 +74,10 @@ To enable rendering, change `render_mode=None` to `render_mode="human"` in the s
 
 ```py
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
+envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", render_mode="human",...
 ```
+
+
 
 ### Custom waypoints
 
@@ -66,6 +93,7 @@ custom_yaw_targets = [0, np.pi, 0, np.pi, 0] # Orientation of the UAV at the way
 <p align="center">
     <img src="/readme_assets/CustomS.png" width="500px"/>
 </p>
+
 
 
 ### Plotting 
@@ -99,18 +127,33 @@ and enable rendering:
 
 ```py
 # Create and initialise dubins path env
-envs = gymnasium.make("PyFlyt/Fixedwing-DubinsPath-v0", render_mode="human",...
+envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", render_mode="human",...
 ```
 
 A GUI will appear that shows the UAV performing in (almost) real time. 
 
 Red sphere represents the Virtual Target Point/Carrot, and green spheres are waypoints.
 
-Example gif:
+Example gif of a Figure 8 path guided by the Carrot Chasing algorithm:
 <p align="center">
-    <img src="/readme_assets/LQR_CC_rand.gif" width="500px"/>
+    <img src="/readme_assets/LQR_CC_8.gif" width="500px"/>
 </p>
 
+
+
+### Comparison Tool
+
+The comparison tool takes in individual `/PathFollowing-Controllers/pathfollowingcontrollers/algorithms/` scripts as command line arguments. There are no limit on the number of algorithms to be compared at a time, designed to be scalable for furture algorithms. 
+
+Here is an example on how to use this tool to compare between 2 algorithms, `NLGL/8.py` and `CarrotChasing/8.py`:
+
+```sh
+cd ./pathfollowingcontrollers/PF_utils/
+python3 compare.py /NLGL/8.py /CarrotChasing/8.py
+```
+
+The resulting artifacts:
+COMING SOON!!!
 
 
 

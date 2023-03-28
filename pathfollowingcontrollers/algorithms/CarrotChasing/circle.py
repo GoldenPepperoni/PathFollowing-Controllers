@@ -14,6 +14,10 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 Kpsi = 2.5
 Ktheta = 0.5
 
+# Initialise PID Speed controller
+speedPID = PID(Kp=1.0, Ki=0.01, Kd=0.01, limits=1.0, period=1/30)
+speedPID.reset()
+
 # Create custom circle path
 custom_targets = [[0, 50, 10], [-100, 50, 10], [0, 50, 10], [-100, 50, 10], [0, 50, 10]]
 custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2] # (-pi to pi)
@@ -58,7 +62,8 @@ while not (terminated or truncated):
     ail = ctrl_lat[0][0]
     rud = ctrl_lat[1][0]
     elev = ctrl_long[0][0]
-    throttle = 0.5
+    throttle = speedPID.step(obs[7], setpoint=20)
+
 
     # Assemble and saturate commands for simulation input
     cmds = np.array([-elev, ail, rud, throttle])

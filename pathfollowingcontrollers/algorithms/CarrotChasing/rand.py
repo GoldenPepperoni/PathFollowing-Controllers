@@ -14,6 +14,10 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 Kpsi = 1
 Ktheta = 0.5
 
+# Initialise PID Speed controller
+speedPID = PID(Kp=1.0, Ki=0.01, Kd=0.01, limits=1.0, period=1/30)
+speedPID.reset()
+
 # Create and initialise dubins path env
 envs = gymnasium.make("PyFlyt/Fixedwing-CCDubinsPath-v0", render_mode=None, angle_representation='euler', flight_dome_size=200, turning_radius=50, num_targets=2)
 next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
@@ -54,7 +58,8 @@ while not (terminated or truncated):
     ail = ctrl_lat[0][0]
     rud = ctrl_lat[1][0]
     elev = ctrl_long[0][0]
-    throttle = 0.5
+    throttle = speedPID.step(obs[7], setpoint=20)
+
 
     # Assemble and saturate commands for simulation input
     cmds = np.array([-elev, ail, rud, throttle])

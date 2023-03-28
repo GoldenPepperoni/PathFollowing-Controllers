@@ -2,6 +2,7 @@ from importlib import import_module
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+from pathfollowingcontrollers.PF_utils.abstractions import *
 
 # Initialise Plot
 fig, ax = plt.subplots(layout='constrained')
@@ -28,13 +29,13 @@ if __name__ == "__main__":
             exit(f"Unable to run {sys.argv[i+1]} !!!")
         
         
-        desiredPath, actualPath, ctrlTraces, IAE, ISE, ITAE = algoModule.getPerformanceData()
+        IAE, ISE, ITAE = getPerformanceData(algoModule.cross_track_err, algoModule.actualPath, algoModule.tArray)
 
         # Plot bar chart comparing errors
 
         offset = width * multiplier
-        rects = ax.bar(i + offset, iae, width, label=algoName)
+        rects = ax.bar(i + offset, IAE, width, label=algoName)
         ax.bar_label(rects, padding=3)
         multiplier += 1
 
-        plt.show()
+    plt.show()

@@ -15,10 +15,6 @@ Kphi = 1
 Ktheta = 0.5
 L1 = 10
 
-# Initialise PID Speed controller
-speedPID = PID(Kp=1.0, Ki=0.01, Kd=0.01, limits=1.0, period=1/30)
-speedPID.reset()
-
 # Create custom figure 8 path
 custom_targets = [[0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [0, 50, 10], [-100, 50, 10], [-200, 50, 10], [-100, 50, 10], [0, 50, 10]]
 custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2,] # (-pi to pi)
@@ -34,7 +30,7 @@ makeGif = False
 imgs_array = []
 
 # Make plots?
-makePlots = False
+makePlots = True
 ctrlTraces = []
 actualPath = [next_obs["attitude"][9:12]]
 cross_track_err = [next_obs["cross_track_err"]]
@@ -48,13 +44,13 @@ while not (terminated or truncated):
     carrot_pos = next_obs['carrot_pos']
     # Assemble state vector for longitudinal and lateral linear models
     s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
-    s_long = [[obs[7]], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
+    s_long = [[obs[7]-20], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
 
     # Get references from NLGL algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1)
     ref_lat, ref_long = getNLGLRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kphi, Ktheta, L1, 1, 1.4)
 
     ref_lat = [ref_lat, 0] # phi and r
-    ref_long = [ref_long] # theta
+    ref_long = [ref_long, 0] # theta
 
     # Get control output from lqr control law
     ctrl_lat = getCtrl(s_lat, K_lat, Nbar_lat, ref_lat)
@@ -63,7 +59,7 @@ while not (terminated or truncated):
     ail = ctrl_lat[0][0]
     rud = ctrl_lat[1][0]
     elev = ctrl_long[0][0]
-    throttle = speedPID.step(obs[7], setpoint=20)
+    throttle = ctrl_long[1][0]
 
 
     # Assemble and saturate commands for simulation input

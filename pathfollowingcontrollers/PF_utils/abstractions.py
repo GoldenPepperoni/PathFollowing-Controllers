@@ -132,6 +132,8 @@ def plotCtrlTraces(ctrlArray, t, title):
         title: string
     """
 
+    t = t[1:]
+
     pitchCtrl = [x[0] for x in ctrlArray] 
     rollCtrl = [x[1] for x in ctrlArray] 
     yawCtrl = [x[2] for x in ctrlArray] 
@@ -287,7 +289,7 @@ def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1, latlim,
     return lat_ref, long_ref
 
 
-def getPerformanceData(cross_track_err, actualPath, ctrlTraces, desiredPath, tArray):
+def getPerformanceData(cross_track_err, actualPaths, tArray):
     """Wrapper to calculate IAE, ISE, and ITAE, along with other performance figures"""
 
     # Illustration of the path and actual trajectory, and how the error is calculated
@@ -297,6 +299,7 @@ def getPerformanceData(cross_track_err, actualPath, ctrlTraces, desiredPath, tAr
     #--->-------->--------------->-----#   > represents the UAV
 
     # Calculate distance travelled by the UAV every timestep
+    actualPath = actualPaths.copy() # Clone actual trajectory array
     actualPath_0 = actualPath.copy() # Clone actual trajectory array
     actualPath.append(np.array([0, 0, 0])) # Add empty element at the last index
     actualPath_0.insert(0, np.array([0, 0, 0])) # Add empty element at the first index
@@ -315,7 +318,7 @@ def getPerformanceData(cross_track_err, actualPath, ctrlTraces, desiredPath, tAr
     # Integrated Time Absolute Error
     ITAE = np.sum(np.multiply(area_array, tArray))
 
-    return np.array(desiredPath), np.array(actualPath), np.array(ctrlTraces), IAE, ISE, ITAE
+    return IAE, ISE, ITAE
 
 
 class PID:

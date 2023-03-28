@@ -26,7 +26,7 @@ makeGif = False
 imgs_array = []
 
 # Make plots?
-makePlots = True
+makePlots = False
 ctrlTraces = []
 actualPath = [next_obs["attitude"][9:12]]
 cross_track_err = [next_obs["cross_track_err"]]

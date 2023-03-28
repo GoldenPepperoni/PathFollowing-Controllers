@@ -37,5 +37,7 @@ if __name__ == "__main__":
         rects = ax.bar(i + offset, IAE, width, label=algoName)
         ax.bar_label(rects, padding=3)
         multiplier += 1
+        ax.legend()
 
+    
     plt.show()

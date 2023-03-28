@@ -72,6 +72,7 @@ while not (terminated or truncated):
     
     # Collect trajectory and control traces
     actualPath.append(obs[9:12])
+    cross_track_err.append(next_obs["cross_track_err"])
     ctrlTraces.append(cmds)
     tArray.append(t)
 

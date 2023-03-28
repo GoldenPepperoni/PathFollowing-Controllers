@@ -287,6 +287,37 @@ def getNLGLRefs(carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1, latlim,
     return lat_ref, long_ref
 
 
+def getPerformanceData(cross_track_err, actualPath, ctrlTraces, desiredPath, tArray):
+    """Wrapper to calculate IAE, ISE, and ITAE, along with other performance figures"""
+
+    # Illustration of the path and actual trajectory, and how the error is calculated
+    #---X--------X---------------X-----#   X represents the closest points on the path for each timestep
+    #---|--------|---------------|-----#  
+    #---|--------|---------------|-----#  
+    #--->-------->--------------->-----#   > represents the UAV
+
+    # Calculate distance travelled by the UAV every timestep
+    actualPath_0 = actualPath.copy() # Clone actual trajectory array
+    actualPath.append(np.array([0, 0, 0])) # Add empty element at the last index
+    actualPath_0.insert(0, np.array([0, 0, 0])) # Add empty element at the first index
+    dist_travelled_3D = np.array(actualPath) - np.array(actualPath_0) # Find distance travelled in each components
+    dist_travelled_3D = dist_travelled_3D[0:-1] # Remove first and last entries
+    dist_travelled = np.linalg.norm(dist_travelled_3D, axis=1) # Calculate absolute difference between each element to find the distance travelled
+    
+    # Array containing the areas made by infinitesimal steps
+    area_array = np.multiply(dist_travelled, cross_track_err)
+
+    # Calculate Sum of absolute errors (By calculating area between the desired and actual trajectory)
+    # Integrated Absolute Error
+    IAE = np.sum(area_array)
+    # Integrated Square Error
+    ISE = np.sum(np.square(area_array))
+    # Integrated Time Absolute Error
+    ITAE = np.sum(np.multiply(area_array, tArray))
+
+    return np.array(desiredPath), np.array(actualPath), np.array(ctrlTraces), IAE, ISE, ITAE
+
+
 class PID:
     def __init__(
         self,

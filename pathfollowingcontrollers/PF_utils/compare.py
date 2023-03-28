@@ -3,11 +3,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.array([])
-itseArray = []
-iseArray = []
-iaeArray = []
-
 # Initialise Plot
 fig, ax = plt.subplots(layout='constrained')
 width = 0.25  # the width of the bars
@@ -33,16 +28,9 @@ if __name__ == "__main__":
             exit(f"Unable to run {sys.argv[i+1]} !!!")
         
         
-        desiredPath, actualPath, ctrlTraces, tArray = algoModule.getPerformanceData()
-
-        # Calculate errors
-        absErr = np.linalg.norm([actualPath])
-        iae = np.sum(absErr)
-        ise = np.sum(absErr**2)
-        itse = np.matmul(absErr, tArray)
+        desiredPath, actualPath, ctrlTraces, IAE, ISE, ITAE = algoModule.getPerformanceData()
 
         # Plot bar chart comparing errors
-
 
         offset = width * multiplier
         rects = ax.bar(i + offset, iae, width, label=algoName)

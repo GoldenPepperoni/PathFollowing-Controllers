@@ -28,9 +28,10 @@ imgs_array = []
 # Make plots?
 makePlots = False
 ctrlTraces = []
-actualPath = [next_obs["attitude"][9:13]]
+actualPath = [next_obs["attitude"][9:12]]
+cross_track_err = [next_obs["cross_track_err"]]
 desiredPath = infos["path"]
-tArray = []
+tArray = [0]
 t = 0
 
 while not (terminated or truncated):
@@ -69,23 +70,22 @@ while not (terminated or truncated):
         imgs_array.append(envs.render()[..., :3].astype(np.uint8))
     
     # Collect trajectory and control traces
-    actualPath.append(obs[9:13])
+    actualPath.append(obs[9:12])
     ctrlTraces.append(cmds)
     tArray.append(t)
 
 if makeGif:
     imgs = [Image.fromarray(img) for img in imgs_array]
-    imgs[0].save("LQR_NLGL_rand.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+    imgs[0].save("NLGL_rand.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
 if makePlots:
-    plotXY(desiredPath, actualPath, "Horizontal trajectory (LQR_NLGL_rand)")
-    plotZ(desiredPath, actualPath, "Vertical trajectory (LQR_NLGL_rand)")
-    plot3D(desiredPath, actualPath, "3D trajectory (LQR_NLGL_rand)")
-    plotCtrlTraces(ctrlTraces, tArray, "Control traces (LQR_NLGL_rand)")
+    plotXY(desiredPath, actualPath, "Horizontal trajectory (NLGL_rand)")
+    plotZ(desiredPath, actualPath, "Vertical trajectory (NLGL_rand)")
+    plot3D(desiredPath, actualPath, "3D trajectory (NLGL_rand)")
+    plotCtrlTraces(ctrlTraces, tArray, "Control traces (NLGL_rand)")
     plt.show()
 
-def getPerformanceData():
-    return desiredPath, actualPath, ctrlTraces, tArray
+
 
 
         

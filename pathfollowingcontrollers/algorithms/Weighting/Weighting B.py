@@ -1,0 +1,112 @@
+import numpy as np
+import PyFlyt.gym_envs
+import gymnasium
+import control
+
+from PIL import Image
+from pathfollowingcontrollers.PF_utils.linModel import *
+from pathfollowingcontrollers.PF_utils.abstractions import *
+# Longitudinal weighting matrices
+p_long = 100
+Q_long = p_long*np.matmul(np.transpose(C_long), C_long)
+R_long = 3 * np.eye(np.shape(C_long)[0])
+# Longitudinal LQR gains
+K_long, _, _ = control.lqr(A_long, B_long, Q_long, R_long)
+Nbar_long = precom(A_long, B_long, C_long, K_long)
+
+
+# Lateral weighting matrices
+p_lat = 100
+Q_lat = p_lat*np.matmul(np.transpose(C_lat), C_lat)
+R_lat = 20 * np.eye(np.shape(C_lat)[0])
+# Lateral LQR gains
+K_lat, _, _ = control.lqr(A_lat, B_lat, Q_lat, R_lat)
+Nbar_lat = precom(A_lat, B_lat, C_lat, K_lat)
+
+# r = readDS4() # For PS4 controller live inputs
+
+# NLGL algorithm parameters
+Kphi = 1
+Ktheta = 0.5
+L1 = 10
+
+# Create custom spiral path
+custom_targets = [[0, 50, 10], [-100, 50, 15], [0, 50, 20], [-100, 50, 25], [0, 50, 30], [-100, 50, 35], [0, 50, 40], [-100, 50, 45]]
+custom_yaw_targets = [np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2, np.pi/2, -np.pi/2] # (-pi to pi)
+
+# Create and initialise dubins path env
+envs = gymnasium.make("PyFlyt/Fixedwing-NLGLDubinsPath-v0", render_mode=None, angle_representation="euler", flight_dome_size=500, turning_radius=50, num_targets=len(custom_yaw_targets), custom_targets=custom_targets, custom_yaw_targets=custom_yaw_targets, NLGL_L1=L1)
+next_obs, infos =envs.reset(aviary_options={"cameraTargetPosition":[-10, -10, 30]})    
+terminated  = False
+truncated = False
+
+# Make gif?
+makeGif = False
+imgs_array = []
+
+# Make plots?
+makePlots = True
+ctrlTraces = []
+actualPath = [next_obs["attitude"][9:12]]
+cross_track_err = [next_obs["cross_track_err"]]
+desiredPath = infos["path"]
+tArray = [0]
+t = 0
+
+while not (terminated or truncated):
+    # Get states from last time step
+    obs = next_obs['attitude']
+    carrot_pos = next_obs['carrot_pos']
+    # Assemble state vector for longitudinal and lateral linear models
+    s_lat = [[obs[6]], [obs[1]], [obs[2]], [obs[4]]] # [v, p, r, phi]
+    s_long = [[obs[7]-20], [obs[8]], [obs[0]], [obs[3]]] # [u, w, q, theta]
+
+    # Get references from NLGL algorithm (carrot_pos, UAV_pos, UAV_ang, UAV_vel, Kphi, Ktheta, L1)
+    ref_lat, ref_long = getNLGLRefs(carrot_pos, obs[9:12], obs[3:6], obs[6:9], Kphi, Ktheta, L1, 1, 1.4)
+
+    ref_lat = [ref_lat, 0] # phi and r
+    ref_long = [ref_long, 0] # theta
+
+    # Get control output from lqr control law
+    ctrl_lat = getCtrl(s_lat, K_lat, Nbar_lat, ref_lat)
+    ctrl_long = getCtrl(s_long, K_long, Nbar_long, ref_long)
+
+    ail = ctrl_lat[0][0]
+    rud = ctrl_lat[1][0]
+    elev = ctrl_long[0][0]
+    throttle = ctrl_long[1][0]
+
+
+    # Assemble and saturate commands for simulation input
+    cmds = np.array([-elev, ail, rud, throttle])
+    cmds = np.clip(cmds, [-1, -1, -1, 0], 1)
+    
+    # Simulation step
+    next_obs, reward, terminated, truncated, infos = envs.step(cmds)
+    t += 1/30
+
+    # Collect frames if making gif
+    if makeGif:
+        imgs_array.append(envs.render()[..., :3].astype(np.uint8))
+    
+    # Collect trajectory and control traces
+    actualPath.append(obs[9:12])
+    cross_track_err.append(next_obs["cross_track_err"])
+    ctrlTraces.append(cmds)
+    tArray.append(t)
+
+if makeGif:
+    imgs = [Image.fromarray(img) for img in imgs_array]
+    imgs[0].save("NLGL_spiral.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+
+if makePlots:
+    plotXY(desiredPath, actualPath, "Horizontal trajectory (NLGL_spiral)")
+    plotZ(desiredPath, actualPath, "Vertical trajectory (NLGL_spiral)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (NLGL_spiral)")
+    plotCtrlTraces(ctrlTraces, tArray, "Control traces (Weighting B)")
+    plt.show()
+
+
+
+
+        

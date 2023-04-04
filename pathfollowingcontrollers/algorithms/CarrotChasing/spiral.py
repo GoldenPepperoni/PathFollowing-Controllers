@@ -86,7 +86,7 @@ if makeGif:
 if makePlots:
     plotXY(desiredPath, actualPath, "Horizontal trajectory (CC_spiral)")
     plotZ(desiredPath, actualPath, "Vertical trajectory (CC_spiral)")
-    plot3D(desiredPath, actualPath, "3D trajectory (CC_spiral)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (CC_spiral)")
     plotCtrlTraces(ctrlTraces, tArray, "Control traces (CC_spiral)")
     plt.show()
 

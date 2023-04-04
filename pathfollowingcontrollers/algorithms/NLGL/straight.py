@@ -87,7 +87,7 @@ if makeGif:
 if makePlots:
     plotXY(desiredPath, actualPath, "Horizontal trajectory (NLGL_straight)")
     plotZ(desiredPath, actualPath, "Vertical trajectory (NLGL_straight)")
-    plot3D(desiredPath, actualPath, "3D trajectory (NLGL_straight)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (NLGL_straight)")
     plotCtrlTraces(ctrlTraces, tArray, "Control traces (NLGL_straight)")
     plt.show()
 

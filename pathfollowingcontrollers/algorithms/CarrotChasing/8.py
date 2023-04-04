@@ -29,7 +29,7 @@ makeGif = False
 imgs_array = []
 
 # Make plots?
-makePlots = False
+makePlots = True
 ctrlTraces = []
 actualPath = [next_obs["attitude"][9:12]]
 cross_track_err = [next_obs["cross_track_err"]]
@@ -87,7 +87,7 @@ if makeGif:
 if makePlots:
     plotXY(desiredPath, actualPath, "Horizontal trajectory (CC_8)")
     plotZ(desiredPath, actualPath, "Vertical trajectory (CC_8)")
-    plot3D(desiredPath, actualPath, "3D trajectory (CC_8)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (CC_8)")
     plotCtrlTraces(ctrlTraces, tArray, "Control traces (CC_8)")
     plt.show()
 

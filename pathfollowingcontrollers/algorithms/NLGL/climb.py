@@ -15,7 +15,7 @@ Kphi = 1
 Ktheta = 0.5
 L1 = 10
 
-# Create custom straight path
+# Create custom climb path
 custom_targets = [[100, -100, 30]]
 custom_yaw_targets = [np.pi/2] # (-pi to pi)
 
@@ -82,13 +82,13 @@ while not (terminated or truncated):
 
 if makeGif:
     imgs = [Image.fromarray(img) for img in imgs_array]
-    imgs[0].save("NLGL_straight.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+    imgs[0].save("NLGL_climb.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
 if makePlots:
-    plotXY(desiredPath, actualPath, "Horizontal trajectory (NLGL_straight)")
-    plotZ(desiredPath, actualPath, "Vertical trajectory (NLGL_straight)")
-    plot3D(desiredPath, actualPath, "3D trajectory (NLGL_straight)")
-    plotCtrlTraces(ctrlTraces, tArray, "Control traces (NLGL_straight)")
+    plotXY(desiredPath, actualPath, "Horizontal trajectory (NLGL_climb)")
+    plotZ(desiredPath, actualPath, "Vertical trajectory (NLGL_climb)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (NLGL_climb)")
+    plotCtrlTraces(ctrlTraces, tArray, "Control traces (NLGL_climb)")
     plt.show()
 
 

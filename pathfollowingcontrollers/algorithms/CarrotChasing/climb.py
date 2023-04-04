@@ -14,7 +14,7 @@ from pathfollowingcontrollers.PF_utils.abstractions import *
 Kpsi = 1
 Ktheta = 0.5
 
-# Create custom straight path
+# Create custom climb path
 custom_targets = [[100, -100, 30]]
 custom_yaw_targets = [np.pi/2] # (-pi to pi)
 
@@ -81,13 +81,13 @@ while not (terminated or truncated):
 
 if makeGif:
     imgs = [Image.fromarray(img) for img in imgs_array]
-    imgs[0].save("CC_straight.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
+    imgs[0].save("CC_climb.gif", save_all=True, append_images=imgs[1:], duration=100/3, loop=0)
 
 if makePlots:
-    plotXY(desiredPath, actualPath, "Horizontal trajectory (CC_straight)")
-    plotZ(desiredPath, actualPath, "Vertical trajectory (CC_straight)")
-    plot3D(desiredPath, actualPath, "3D trajectory (CC_straight)")
-    plotCtrlTraces(ctrlTraces, tArray, "Control traces (CC_straight)")
+    plotXY(desiredPath, actualPath, "Horizontal trajectory (CC_climb)")
+    plotZ(desiredPath, actualPath, "Vertical trajectory (CC_climb)")
+    plot3D(desiredPath, [actualPath], "3D trajectory (CC_climb)")
+    plotCtrlTraces(ctrlTraces, tArray, "Control traces (CC_climb)")
     plt.show()
 
 

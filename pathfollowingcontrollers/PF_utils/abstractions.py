@@ -92,30 +92,33 @@ def plotZ(desired, actual, title):
     plt.savefig("plots/"+title)
 
 
-def plot3D(desired, actual, title):
+def plot3D(desired, actual, title, algoNames=["Actual Path"]):
     """ Create a plot showing the UAV's desired vs actual trajectory in the 3-Dimensions.
         desired: n by 3 array, n = number of time steps
         actual: n by 3 array, n = number of time steps
         title: string
     """
+    fig = plt.figure()
 
     # Extract coordinates from path array
     X_D = [x[0] for x in desired]
     Y_D = [x[1] for x in desired]
     Z_D = [x[2] for x in desired]
 
-    # Extract coordinates from actual trajectory array
-    X_A = [x[0] for x in actual]
-    Y_A = [x[1] for x in actual]
-    Z_A = [x[2] for x in actual]
-
-    fig = plt.figure()
     ax = fig.add_subplot(projection='3d')    
     ax.scatter(X_D[0], Y_D[0], Z_D[0], label="Start", c=[[0, 1, 0]])
     ax.scatter(X_D[-1], Y_D[-1], Z_D[-1], label="End", c=[[1, 0, 0]])
-    plt.plot(X_D, Y_D, Z_D, label="Desired")
-    plt.plot(X_A, Y_A, Z_A, label="Actual")
-    ax.set_zlim3d(min(Z_D)-5, max(Z_D)+5) # +- max and min in the Z axis, to prevent drawn out plot
+    plt.plot(X_D, Y_D, Z_D, label="Desired Path")
+
+    for i in range(0, len(algoNames)):
+        # Extract coordinates from actual trajectory array
+        X_A = [x[0] for x in actual[i]]
+        Y_A = [x[1] for x in actual[i]]
+        Z_A = [x[2] for x in actual[i]]
+
+        plt.plot(X_A, Y_A, Z_A, label=algoNames[i])
+        ax.set_zlim3d(min(Z_D)-5, max(Z_D)+5) # +- max and min in the Z axis, to prevent drawn out plot
+
     ax.set_xlabel("X(m)")
     ax.set_ylabel("Y(m)")
     ax.set_zlabel("Z(m)")

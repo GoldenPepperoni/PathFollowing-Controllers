@@ -2,6 +2,10 @@
 
 This repository is the culmination of path following algorithms for a fixed-wing small UAV (2.5Kg), simulated in [PyFlyt](https://github.com/jjshoots/PyFlyt)
 
+<p align="center">
+    <img src="/readme_assets/NLGL_rand.gif" width="500px"/>
+</p>
+
 
 Key features:
 - The fixed wing UAV was modelled and simulated as part of [PyFlyt](https://github.com/jjshoots/PyFlyt), more information on the physics and flight model can be found there.
@@ -154,8 +158,23 @@ python3 compare.py /NLGL/8.py /CarrotChasing/8.py
 ```
 
 The resulting artifacts:
-COMING SOON!!!
 
+1) Visual comparison of each trajectory:
+<p align="center">
+    <img src="/readme_assets/NLGLvsCC 8 3D comparison.png" width="500px"/>
+</p>
+
+This image was generated in a new interactive window, which allows users to pan and zoom to get a closer look like this:
+<p align="center">
+    <img src="/readme_assets/NLGLvsCC 8 Zoomed 3D comparison.png" width="500px"/>
+</p>
+
+2) The comparison of Integrated Absolute Error (IAE), Integrated Square Error (ISE) and Integrated Time Absolute Error (ITAE)
+<p align="center">
+    <img src="/readme_assets/NLGLvsCC 8 Metrics comparison.png" width="500px"/>
+</p>
+
+These performance mettrics are based on the (commonly used definition in control theory)[https://electricalvoice.com/performance-indices-in-control-system-ise-iae-itse-itae/]
 
 
 

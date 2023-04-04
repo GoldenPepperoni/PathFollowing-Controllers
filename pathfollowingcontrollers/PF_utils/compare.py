@@ -62,7 +62,7 @@ if __name__ == "__main__":
 
 
     # Plot desired vs actual trajectory
-    plot3D(desired_path_arr[0], actual_path_arr, title, algoName_arr)
+    plot3D(desired_path_arr[0], actual_path_arr, "3D Trajectory "+title, algoName_arr)
 
 
     # Collect metrics into a dictionary
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         ax.legend(loc='upper center')
 
     ax.set_xticks(np.arange(len(IAE_arr)) + width, algoName_arr)
-    ax.set_title(title)
-    plt.savefig("plots/"+title)
+    ax.set_title("Metrics of "+title)
+    plt.savefig("plots/"+"Metrics of "+title)
 
     plt.show()
